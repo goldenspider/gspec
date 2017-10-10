@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	. "h12.me/gspec/extension"
+	. "github.com/goldenspider/gspec/extension"
 )
 
 func init() {

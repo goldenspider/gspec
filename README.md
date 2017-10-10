@@ -44,8 +44,8 @@ Quick start
 
 ###Get GSpec
 ```bash
-go get -u -f h12.me/gspec
-go test h12.me/gspec/...
+go get -u -f github.com/goldenspider/gspec
+go test github.com/goldenspider/gspec/...
 ```
 
 ###Write tests with GSpec
@@ -55,7 +55,7 @@ write GSpec tests in file xxx_test.go to test code in xxx.go.
 import (
 	"fmt"
 
-	"h12.me/gspec"
+	"github.com/goldenspider/gspec"
 )
 
 // Only one gspec.Add is needed for each xxx_test.go file.
@@ -111,7 +111,7 @@ package (e.g. all_test.go).
 ```go
 import (
 	"testing"
-	"h12.me/gspec"
+	"github.com/goldenspider/gspec"
 )
 
 // Defined only once within a package.

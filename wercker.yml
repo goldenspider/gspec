@@ -3,7 +3,7 @@ box: golang
 build:
     steps:
          - setup-go-workspace:
-             package-dir: h12.me/gspec
+             package-dir: github.com/goldenspider/gspec
 
          - script:
              name: go-build

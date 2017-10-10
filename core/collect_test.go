@@ -8,8 +8,8 @@ import (
 	"errors"
 	"testing"
 
-	exp "h12.me/gspec/expectation"
-	. "h12.me/gspec/extension"
+	exp "github.com/goldenspider/gspec/expectation"
+	. "github.com/goldenspider/gspec/extension"
 )
 
 /*

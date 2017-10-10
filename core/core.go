@@ -6,12 +6,12 @@
 Package core provides a minimal core for organizing, executing and reporting of
 test cases nested in test groups.
 */
-package core // import "h12.me/gspec/core"
+package core
 
 import (
 	"sync"
 
-	ext "h12.me/gspec/extension"
+	ext "github.com/goldenspider/gspec/extension"
 )
 
 // Controller is the "C" of MVC (Model View Controller). In a test framework,
