@@ -41,14 +41,35 @@ func (c *Controller) Start(path Path, concurrent bool, funcs ...TestFunc) error 
 		c.broadcaster.End(c.group)
 	}()
 
-	newRunner(func(s S) {
-		top := s.Alias("")
-		top("", func() {
-			for _, f := range funcs {
-				f(s)
+	var bPath bool
+	if len(path) != 0 {
+		bPath = true
+	}
+	var rs []*runner
+	for i, v := range funcs {
+		f := v
+		if bPath == false {
+			path = Path{Serial(i)}
+		} else {
+			if Serial(i) != path[0] {
+				continue
 			}
-		})
-	}, concurrent, c.collector).run(path)
+		}
+
+		r := newRunner(func(s S) {
+			top := s.Alias("")
+			top("", func() {
+				f(s)
+			})
+		}, concurrent, c.collector)
+
+		rs = append(rs, r)
+		r.run(path)
+	}
+
+	for _, r := range rs {
+		r.wg.Wait()
+	}
 
 	return nil
 }
@@ -71,7 +92,7 @@ func (b *broadcaster) Start() {
 	}
 }
 
-func (b *broadcaster) End(group *ext.TestGroup) {
+func (b *broadcaster) End(group ext.TestGroups) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	for _, r := range b.a {

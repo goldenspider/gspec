@@ -17,7 +17,11 @@ func (f TestFunc) toConcurrent(wg *sync.WaitGroup) TestFunc {
 	return func(s S) {
 		wg.Add(1)
 		go func() {
-			defer wg.Done()
+			defer func() {
+				wg.Done()
+				if err := recover(); err != nil {
+				}
+			}()
 			f(s)
 		}()
 	}
@@ -27,7 +31,11 @@ func (f TestFunc) toConcurrent(wg *sync.WaitGroup) TestFunc {
 func (f TestFunc) toMeasurable() TestFunc {
 	return func(s S) {
 		s.start()
-		defer s.end()
+		defer func() {
+			s.end()
+			if err := recover(); err != nil {
+			}
+		}()
 		f(s)
 	}
 }
@@ -49,7 +57,7 @@ type runner struct {
 func newRunner(f TestFunc, concurrent bool, c *collector) *runner {
 	r := &runner{f: f.toMeasurable(), c: c}
 	if concurrent {
-		r.f = r.f.toConcurrent(&r.wg)
+		r.f = f.toConcurrent(&r.wg)
 	}
 	return r
 }
@@ -63,7 +71,7 @@ func (r *runner) run(dst Path) {
 		}
 		// make sure that there are no test groups running so that all groups
 		// have been visited.
-		r.wg.Wait()
+		//r.wg.Wait()
 	}
 }
 

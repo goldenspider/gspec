@@ -49,7 +49,8 @@ func init() {
 // Add GSpec test functions to the global test suite.
 // Return value has no meaning, allowing it to be called in global scope.
 func Add(fs ...TestFunc) int {
-	for _, f := range fs {
+	for _, v := range fs {
+		f := v
 		testFunctions = append(testFunctions, func(s core.S) { f(S{s}) })
 	}
 	return 0

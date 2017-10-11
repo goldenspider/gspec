@@ -35,25 +35,29 @@ type textReporter struct {
 	verbose bool
 }
 
-func (l *textReporter) End(root *ext.TestGroup) {
+func (l *textReporter) End(root ext.TestGroups) {
 	mid := make(map[string]bool)
-	if root.Error != nil {
-		writeTestGroups(l.w, ext.TestGroups{root}, mid)
-	}
-	for _, g := range root.Children {
-		completed := g.For(func(path ext.TestGroups) bool {
-			last := path[len(path)-1]
-			if l.verbose || last.Error != nil {
-				if !writeTestGroups(l.w, path, mid) {
-					return false
+	for _, r := range root {
+		//		if root.Error != nil {
+		//			writeTestGroups(l.w, ext.TestGroups{root}, mid)
+		//		}
+		for _, g := range r.Children {
+			completed := g.For(func(path ext.TestGroups) bool {
+				last := path[len(path)-1]
+				if l.verbose || last.Error != nil {
+					if !writeTestGroups(l.w, path, mid) {
+						return false
+					}
 				}
+				return true
+			})
+			if !completed {
+				break
 			}
-			return true
-		})
-		if !completed {
-			break
 		}
 	}
+
+	fmt.Fprint(l.w, "\n")
 	if l.Stats.Failed > 0 {
 		fmt.Fprintf(l.w, ">>> FAIL COUNT: %d of %d.\n", l.Stats.Failed, l.Stats.Total)
 	}
@@ -91,14 +95,14 @@ func (p *textProgresser) Progress(g *ext.TestGroup, s *ext.Stats) {
 	p.Stats = *s
 }
 
-func (p *textProgresser) End(group *ext.TestGroup) {
+func (p *textProgresser) End(group ext.TestGroups) {
 	fmt.Fprintln(p.w, "$")
 }
 
 type dummyReporter struct{}
 
 func (dummyReporter) Start()                              {}
-func (dummyReporter) End(*ext.TestGroup)                  {}
+func (dummyReporter) End(ext.TestGroups)                  {}
 func (dummyReporter) Progress(*ext.TestGroup, *ext.Stats) {}
 
 // Write writes TestGroups from root to leaf.
@@ -127,7 +131,7 @@ func writeTestGroups(w io.Writer, gs ext.TestGroups, mid map[string]bool) bool {
 }
 
 func printFocusInstruction(w io.Writer, indent, id string) {
-	fmt.Fprintf(w, ge.Indent(`  (use "go test -focus %s" to run the test case only.)`, indent), id)
+	fmt.Fprintf(w, ge.Indent(`  (use "go test -focus %s" to run the test case only.)`, indent)+"\n", id)
 }
 
 func writePanicError(w io.Writer, e *ext.PanicError) {

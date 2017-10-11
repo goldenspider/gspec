@@ -5,12 +5,17 @@
 package core
 
 import (
+	//	"fmt"
 	"sync"
 
 	ext "github.com/goldenspider/gspec/extension"
 )
 
 type failNowError struct {
+	error
+}
+
+type failNowIgnoreError struct {
 	error
 }
 
@@ -58,9 +63,11 @@ func (t *testError) capturePanic(f func()) {
 			switch err := e.(type) {
 			case failNowError:
 				t.setErr(err.error)
+			case failNowIgnoreError:
 			default:
 				t.setErr(ext.NewPanicError(e, 2))
 			}
+			panic(failNowIgnoreError{})
 		}
 	}()
 	if f != nil {

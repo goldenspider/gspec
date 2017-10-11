@@ -13,7 +13,7 @@ import (
 )
 
 type collector struct {
-	group *ext.TestGroup
+	group ext.TestGroups
 	m     map[string]*ext.TestGroup
 	mu    sync.Mutex
 	r     ext.Reporter
@@ -36,7 +36,7 @@ func (c *collector) groupStart(g *ext.TestGroup, path Path) {
 	}
 	c.Total++
 	if len(path) == 1 { // root node
-		c.group = g
+		c.group = append(c.group, g)
 	} else {
 		parentID := path[:len(path)-1].String()
 		parent := c.m[parentID] // must exists
@@ -71,7 +71,11 @@ func (c *collector) groupEnd(err error, path Path) {
 }
 
 func (c *collector) sort() {
-	sortTestGroup(c.group)
+	sort.Sort(byID{c.group})
+	for _, g := range c.group {
+		sortTestGroup(g)
+	}
+
 }
 
 func (c *collector) setDuration(path Path, d time.Duration) {

@@ -25,11 +25,17 @@ func newGroup(dst Path, run runFunc) *group {
 func (g *group) visit(f func(cur Path)) {
 	g.cur.push(g.next)
 	g.next = 0
+	if len(g.dst) > len(g.cur.Path) {
+		g.next = g.dst[len(g.cur.Path)]
+	}
+
 	defer func() { g.next = g.cur.pop() + 1 }()
 	if !g.cur.onPath(g.dst) {
 		return
 	} else if g.done {
-		g.runNew(g.cur.Path)
+		//g.runNew(g.cur.Path)
+		g.done = false
+		f(g.cur.Path)
 		return
 	}
 	defer func() { g.done = true }()
