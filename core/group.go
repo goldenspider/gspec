@@ -23,11 +23,12 @@ func newGroup(dst Path, run runFunc) *group {
 // stops calling the rest closures on path, but provides the path of them
 // through group.runNew.
 func (g *group) visit(f func(cur Path)) {
+	if len(g.cur.Path) == 0 {
+		g.next = g.dst[0]
+	}
+
 	g.cur.push(g.next)
 	g.next = 0
-	if len(g.dst) > len(g.cur.Path) {
-		g.next = g.dst[len(g.cur.Path)]
-	}
 
 	defer func() { g.next = g.cur.pop() + 1 }()
 	if !g.cur.onPath(g.dst) {
